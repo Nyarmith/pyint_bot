@@ -1,4 +1,4 @@
-#!/venv/bin/python3
+#!/usr/bin/python3
 
 #basically a 3-level dictionary 
 #    {chat_id1 : 
@@ -24,7 +24,7 @@ class Lists(object):
 
     def __init__(self):
         self.listos = {}
-        self.save()
+        #self.save()
 
     #save current state to file
     def save():
