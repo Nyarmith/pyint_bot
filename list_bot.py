@@ -24,6 +24,7 @@ class Lists(object):
 
     def __init__(self):
         self.listos = {}
+        self.save()
 
     #save current state to file
     def save():
@@ -55,7 +56,7 @@ class Lists(object):
         if listo in self.listos[chat_id]:
             self.listos[chat_id][listo].append(item)
             return True
-        else
+        else:
             return False
 
     #remove item from existing list; returns a bool
@@ -100,7 +101,6 @@ class Lists(object):
             return []
 
 
-bot.sendMessage(chat_id, "Your list:\n{}".format(ret))
 
 # help info
 help_string = "List Bot! A bot for keeping track of lists with your friends and family!. \n\
@@ -130,18 +130,23 @@ def handle(msg):
             bot.sendMessage(chat_id, "usage: /addlist <list>")
         elif listos.add_listo(chat_id, cmd[1]):
             bot.sendMessage(chat_id, "%s added" % cmd[1])
-        else
+        else:
             bot.sendMessage(chat_id, "%s already exists!" % cmd[1])
 
     elif command[:4] == '/add':
         cmd = command.split()
         if len(cmd) < 3:
             bot.sendMessage(chat_id, "usage: /add <list> <item>")
-        elif listos.add_item(chat_id, cmd[1], cmd[2])
+        elif listos.add_item(chat_id, cmd[1], cmd[2]):
             bot.sendMessage(chat_id, "%s added to %s" % (cmd[2]. cmd[1]))
         else:
             bot.sendMessage(chat_id, "List %s does not exist" % cmd[1])
 
+    elif command[:5] == '/save':
+        telebot.save()
+
+    #elif command[:5] == '/load':
+        #telebot.load()
 
     elif command[:5] == '/list':
         cmd = command.split()
@@ -199,7 +204,7 @@ def handle(msg):
 
 f = open('config.yml')
 cfgstr = f.read()
-mykey = yaml.load(mykey)['key']
+mykey = yaml.load(cfgstr)['key']
 f.close()
 bot = telepot.Bot(mykey)
 
