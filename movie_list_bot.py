@@ -197,10 +197,12 @@ def handle(msg):
         bot.sendMessage(chat_id, help_string + special_str)
 
 
-config = configparser.ConfigParser()
-config.read('config.ini')
-key = config['DEFAULT']['key']
-bot = telepot.Bot(key)
+
+f = open('config.yml')
+cfgstr = f.read()
+mykey = yaml.load(mykey)['key']
+f.close()
+bot = telepot.Bot(mykey)
 
 bot.message_loop(handle)
 print("i'm listening yo")
