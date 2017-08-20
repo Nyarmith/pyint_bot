@@ -15,7 +15,6 @@
 
 import time, os
 import pickle
-import configparser
 import telepot
 import random
 import yaml
