@@ -1,10 +1,13 @@
-# @movie\_list\_bot
-## Username: moviebot
+# @list_list_bot
+## Username: listu_botteru
 
 A bot to facilitate movie watchlists with groups of friends!
 
 Endpoints:  
-* /add        Add a movie to your watchlist  
-* /list       List of movies to watch  
-* /watched    Tell movie\_list\_bot you've watched this movie (and remove it from your watchlist)  
-* /finished   List of movies your group has finished  
+* /addlist  <list>          Creates a new list
+* /list                     Returns current lists
+* /list     <list>          List items in a list
+* /add      <list> <item>   Add an item to a list
+* /rm       <list> <item>   Add an item to a list
+* /complete <list> <item>   Mark item as completed
+* /finished <list>          List of completed items from a list
