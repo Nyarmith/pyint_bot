@@ -20,7 +20,7 @@ import random
 import yaml
 
 class Lists(object):
-    empty_chat = { 'list':[], 'finished':[] }
+    empty_chat = {}
 
     def __init__(self):
         self.listos = {}
@@ -40,7 +40,7 @@ class Lists(object):
 
     #initialized on new chat using the bot
     def new_chat(self, chat_id):
-        self.listos[chat_id] = {};
+        self.listos[chat_id] = self.empty_chat;
 
     #create a new list; returns a bool
     def add_listo(self, chat_id, listo):
@@ -84,7 +84,7 @@ class Lists(object):
 
     #show lists for chat_id; returns a list type
     def list_listos(self, chat_id):
-        return self.listos[chat_id].keys()
+        return [x for x in list(self.listos[chat_id].keys()) if x[0] != '.']
 
     #show lists for list_id in a chat_id; returns a list type
     def list_items(self, chat_id, listo):
@@ -137,8 +137,8 @@ def handle(msg):
         cmd = command.split()
         if len(cmd) < 3:
             bot.sendMessage(chat_id, "usage: /add <list> <item>")
-        elif listos.add_item(chat_id, cmd[1], cmd[2]):
-            bot.sendMessage(chat_id, "%s added to %s" % (cmd[2]. cmd[1]))
+        elif listos.add_item(chat_id, cmd[1], command[command.index(cmd[2]):].strip()):
+            bot.sendMessage(chat_id, "%s added to %s" % (cmd[2], cmd[1]))
         else:
             bot.sendMessage(chat_id, "List %s does not exist" % cmd[1])
 
@@ -157,11 +157,11 @@ def handle(msg):
             else:
                 bot.sendMessage(chat_id, "Lists in your group :\n" + '\n'.join(ourlists))
         else:   #list a specific list
-            ourlists = listos.list_items(chat_id, listo)
+            ourlists = listos.list_items(chat_id, cmd[1])
             if ourlists == []:
                 bot.sendMessage(chat_id, "Empty or Nonexistent List!\n")
             else:
-                bot.sendMessage(chat_id, "Lists in your group : " + '\n'.join(ourlists))
+                bot.sendMessage(chat_id, ("Items in %s : \n" % cmd[1]) + '\n'.join(ourlists))
 
 
 
@@ -170,28 +170,30 @@ def handle(msg):
         if len(cmd) < 2:   #just list the lists
             bot.sendmessage(chat_id, "usage: /finished <list>")
         else:
-            ourlist = listo.finished_listos(chat_id, cmd[1])
-            bot.sendMessage(chat_id, ("Completed items from %s : " % cmd[1]) + '\n'.join(ourlists))
+            ourlist = listos.finished_listos(chat_id, cmd[1])
+            bot.sendMessage(chat_id, ("Completed items from %s : \n" % cmd[1]) + '\n'.join(ourlist))
 
     elif command[:9] == '/complete':
         cmd = command.split()
-        if len(cmd < 3):
+        if len(cmd) < 3:
             bot.sendMessage(chat_id, "usage: /complete <list> <item>")
-        elif listo.complete_item(chat_id, cmd[1], cmd[2]):
+        elif listos.complete_item(chat_id, cmd[1], command[command.index(cmd[2]):].strip()):
             bot.sendMessage(chat_id, "marked %s as completed!" % cmd[2])
         else:
             bot.sendMessage(chat_id, "Error: no such item or list")
 
     elif command[:3] == '/rm':
         cmd = command.split()
-        if len(cmd < 3):
+        if len(cmd) < 3:
             bot.sendMessage(chat_id, "usage: /rm <list> <item>")
-        elif listos.remove_item(chat_id, cmd[1], cmd[2]):
+        elif listos.remove_item(chat_id, cmd[1], command[command.index(cmd[2]):]):
             bot.sendMessage(chat_id, "%s removed from %s" % (cmd[2], cmd[1]))
         else:
             bot.sendMessage(chat_id, "Error: no such item or list")
 
-    # help string
+    elif command[:6] == '/start':
+        listos.new_chat(chat_id)
+
     elif command[:5] == '/help':
         special_str=""
         if random.random() < 0.15:
