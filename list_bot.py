@@ -205,7 +205,7 @@ def handle(msg):
         if random.random() < 0.15:
             special_str += "\nWarning: Do Not Use For Movies!"
         if random.random() < 0.10:
-            special_str += "\nNo warantee provided"
+            special_str += "\nNo warranty provided"
         bot.sendMessage(chat_id, help_string + special_str)
 
 
