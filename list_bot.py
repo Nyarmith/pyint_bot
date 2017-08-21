@@ -20,27 +20,29 @@ import random
 import yaml
 
 class Lists(object):
-    empty_chat = {}
 
     def __init__(self):
-        self.listos = {}
+        if os.path.isfile('chats/listo'):
+            self.load()
+        else:
+            self.listos = {}
         #self.save()
 
     #save current state to file
-    def save():
-        f = open('chats/listo')
+    def savelists(self):
+        f = open('chats/listo', 'w')
         f.write(yaml.dump(self.listos))
         f.close()
 
     #load file state to object
-    def load():
+    def load(self):
         f = open('chats/listo')
         self.listos = yaml.load(f.read())
         f.close()
 
     #initialized on new chat using the bot
     def new_chat(self, chat_id):
-        self.listos[chat_id] = self.empty_chat;
+        self.listos[chat_id] = {}
 
     #create a new list; returns a bool
     def add_listo(self, chat_id, listo):
@@ -143,7 +145,7 @@ def handle(msg):
             bot.sendMessage(chat_id, "List %s does not exist" % cmd[1])
 
     elif command[:5] == '/save':
-        telebot.save()
+        listos.savelists()
 
     #elif command[:5] == '/load':
         #telebot.load()
