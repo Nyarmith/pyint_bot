@@ -29,7 +29,7 @@ class Lists(object):
         #self.save()
 
     #save current state to file
-    def savelists(self):
+    def save(self):
         f = open('chats/listo', 'w')
         f.write(yaml.dump(self.listos))
         f.close()
@@ -132,6 +132,7 @@ def handle(msg):
             bot.sendMessage(chat_id, "usage: /addlist <list>")
         elif listos.add_listo(chat_id, cmd[1]):
             bot.sendMessage(chat_id, "%s added" % cmd[1])
+            listos.save()
         else:
             bot.sendMessage(chat_id, "%s already exists!" % cmd[1])
 
@@ -141,11 +142,12 @@ def handle(msg):
             bot.sendMessage(chat_id, "usage: /add <list> <item>")
         elif listos.add_item(chat_id, cmd[1], command[command.index(cmd[2]):].strip()):
             bot.sendMessage(chat_id, "%s added to %s" % (cmd[2], cmd[1]))
+            listos.save()
         else:
             bot.sendMessage(chat_id, "List %s does not exist" % cmd[1])
 
     elif command[:5] == '/save':
-        listos.savelists()
+        listos.save()
 
     #elif command[:5] == '/load':
         #telebot.load()
@@ -181,6 +183,7 @@ def handle(msg):
             bot.sendMessage(chat_id, "usage: /complete <list> <item>")
         elif listos.complete_item(chat_id, cmd[1], command[command.index(cmd[2]):].strip()):
             bot.sendMessage(chat_id, "marked %s as completed!" % cmd[2])
+            listos.save()
         else:
             bot.sendMessage(chat_id, "Error: no such item or list")
 
@@ -190,6 +193,7 @@ def handle(msg):
             bot.sendMessage(chat_id, "usage: /rm <list> <item>")
         elif listos.remove_item(chat_id, cmd[1], command[command.index(cmd[2]):]):
             bot.sendMessage(chat_id, "%s removed from %s" % (cmd[2], cmd[1]))
+            listos.save()
         else:
             bot.sendMessage(chat_id, "Error: no such item or list")
 
