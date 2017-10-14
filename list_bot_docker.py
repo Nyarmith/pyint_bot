@@ -212,7 +212,7 @@ def handle(msg):
 
 f = open('config.yml')
 cfgstr = f.read()
-mykey = yaml.load(cfgstr)['key']
+mykey = os.environ['TELEKEY'] #yaml.load(cfgstr)['key']
 f.close()
 bot = telepot.Bot(mykey)
 
