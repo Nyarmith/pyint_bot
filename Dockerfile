@@ -2,12 +2,12 @@
 # environment variable TELEKEY
 FROM frolvlad/alpine-python3
 
-RUN useradd -m -u 1020 telebot
+VOLUME /opt/list_bot/chats
 
-USER telebot
+WORKDIR /opt/list_bot/
 
-WORKDIR /home/telebot/
+RUN pip install telepot && pip install pyyaml
 
-ADD list_bot_docker.py
+ADD list_bot_docker.py .
 
 CMD python3 list_bot_docker.py

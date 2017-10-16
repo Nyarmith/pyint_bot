@@ -1,0 +1,20 @@
+# Telegram bot key must be passed through the
+# environment variable TELEKEY
+FROM ubuntu
+
+VOLUME /opt/list_bot/chats
+
+RUN apt update && apt install -y python3 \
+               && apt install -y python3-pip \
+               && pip3 install telepot \
+               && pip3 install pyyaml
+
+
+RUN useradd -u 1020 telebot
+USER telebot
+
+WORKDIR /opt/list_bot/
+
+ADD list_bot_docker.py .
+
+CMD python3 list_bot_docker.py

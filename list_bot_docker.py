@@ -210,10 +210,10 @@ def handle(msg):
 
 
 
-f = open('config.yml')
-cfgstr = f.read()
+#f = open('config.yml')
+#cfgstr = f.read()
 mykey = os.environ['TELEKEY'] #yaml.load(cfgstr)['key']
-f.close()
+#f.close()
 bot = telepot.Bot(mykey)
 
 bot.message_loop(handle)
