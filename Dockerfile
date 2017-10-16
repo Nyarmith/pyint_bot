@@ -2,12 +2,12 @@
 # environment variable TELEKEY
 FROM frolvlad/alpine-python3
 
-RUN useradd -m -u 1020 telebot
+#RUN useradd -m -u 1020 telebot
 
-USER telebot
+#USER telebot
 
-WORKDIR /home/telebot/
+#WORKDIR /home/telebot/
 
-ADD list_bot_docker.py
+ADD list_bot_docker.py .
 
 CMD python3 list_bot_docker.py
