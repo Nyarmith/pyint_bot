@@ -53,6 +53,14 @@ class Lists(object):
         else:
             return False
 
+    #create a new list; returns a bool
+    def rm_listo(self, chat_id, listo):
+        if listo in self.listos[chat_id]:
+            self.listos[chat_id].pop(listo, None)
+            return True
+        else:
+            return False
+
     #add item to existing list; returns a bool
     def add_item(self, chat_id, listo, item):
         if listo in self.listos[chat_id]:
@@ -136,6 +144,19 @@ def handle(msg):
         else:
             bot.sendMessage(chat_id, "%s already exists!" % cmd[1])
 
+    elif command[:7] == '/rmlist':
+        cmd = command.split()
+        if len(cmd) < 2:
+            bot.sendMessage(chat_id, "usage: /rmlist <list>")
+        elif listos.rm_listo(chat_id, cmd[1]):
+            bot.sendMessage(chat_id, "%s removed" % cmd[1])
+            listos.save()
+        else:
+            bot.sendMessage(chat_id, "List %s does not exist" % cmd[1])
+
+    elif command[:5] == '/save':
+        listos.save()
+
     elif command[:4] == '/add':
         cmd = command.split()
         if len(cmd) < 3:
@@ -146,8 +167,6 @@ def handle(msg):
         else:
             bot.sendMessage(chat_id, "List %s does not exist" % cmd[1])
 
-    elif command[:5] == '/save':
-        listos.save()
 
     #elif command[:5] == '/load':
         #telebot.load()
