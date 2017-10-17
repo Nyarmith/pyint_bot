@@ -11,3 +11,5 @@ Endpoints:
 * /rm       <list> <item>   Add an item to a list
 * /complete <list> <item>   Mark item as completed
 * /finished <list>          List of completed items from a list
+
+To use the bot in a new chat, you must run _/start_
