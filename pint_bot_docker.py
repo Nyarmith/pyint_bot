@@ -1,18 +1,4 @@
 #!/usr/bin/python3
-
-#basically a 3-level dictionary 
-#    {chat_id1 : 
-#        {list1 : [item1, item2], 
-#        .list1 : [item3, item4], 
-#         list2 : [item1, item2],
-#        .list2 : [item3] , ...}, 
-#     chat_id2
-#        {list1 : [item1, item2], 
-#        .list1 : [item3, item4], 
-#         list2 : [item1, item2],
-#        .list2 : [item3] , ...}, 
-#..}
-
 import telepot
 import pexpect
 import os
@@ -29,9 +15,9 @@ def handle(msg):
 
     if command[:4] == '/run':
         cmd = command[5:]
-        ret = runCmd(cmd)
         session.sendline(cmd)
         session.expect('>>>')
+        print(session.before)
         bot.sendMessage(chat_id, session.before)
 
     elif command[:5] == '/help':
