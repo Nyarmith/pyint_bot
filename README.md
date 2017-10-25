@@ -1,5 +1,5 @@
-# @list_list_bot
-## Username: listu_botteru
+# @pyint_bot
+## Username: PyInt_bot
 
 A bot to facilitate movie watchlists with groups of friends!
 
