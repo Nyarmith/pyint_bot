@@ -14,7 +14,7 @@ def handle(msg):
     print("got command: {}".format(command))
 
     if command[:4] == '/run':
-        cmd = command[5:]
+        cmd = command[command.find(' ')+1:]
         session.sendline(cmd)
         session.expect('>>>')
         print(session.before)

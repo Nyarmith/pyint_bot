@@ -2,9 +2,9 @@
 # environment variable TELEKEY
 FROM frolvlad/alpine-python3
 
-VOLUME /opt/list_bot/chats
+VOLUME /opt/pyint_bot/chats
 
-WORKDIR /opt/list_bot/
+WORKDIR /opt/pyint_bot/
 
 RUN pip install telepot && pip install pexpect
 
