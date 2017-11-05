@@ -19,7 +19,7 @@ def handle(msg):
         cmd = command[command.find(' ')+1:]
         cmd = re.sub(r'#n','\n',cmd)
         session.sendline(cmd)
-        session.expect(r'>>>|\.\.\.')
+        session.expect(r'>>>|\.\.\.', timeout=15)
         print(session.before)
         bot.sendMessage(chat_id, session.before)
 
