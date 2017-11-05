@@ -10,6 +10,7 @@ session = pexpect.spawn('python3')
 session.expect('>>>')
 
 def handle(msg):
+    global session
     chat_id = msg['chat']['id']
     command = msg['text']
 
