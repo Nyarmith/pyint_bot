@@ -1,5 +1,6 @@
 # Telegram bot key must be passed through the
 # environment variable TELEKEY
+#FROM python:3.7.0a2
 FROM frolvlad/alpine-python3
 
 VOLUME /opt/pyint_bot/chats

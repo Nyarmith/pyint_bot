@@ -2,6 +2,8 @@
 import telepot
 import pexpect
 import os
+import sys
+import re
 
 #start python interpreter session in expect
 session = pexpect.spawn('python3')
@@ -15,13 +17,24 @@ def handle(msg):
 
     if command[:4] == '/run':
         cmd = command[command.find(' ')+1:]
+        cmd = re.sub(r'#n','\n',cmd)
         session.sendline(cmd)
-        session.expect('>>>')
+        session.expect(r'>>>|\.\.\.')
         print(session.before)
         bot.sendMessage(chat_id, session.before)
 
+    elif command[:6] == '/reset':
+        session.kill(0)
+        session = pexpect.spawn('python3')
+        session.expect('>>>')
+        bot.sendMessage(chat_id, 'session reset')
+
+    elif command[:8] == '/restart': #restart docker container
+        sys.exit(0)		    #assumes setting 'restart: always'
+
     elif command[:5] == '/help':
-        special_str="lol"
+        help_string =''
+        special_str='lol'
         bot.sendMessage(chat_id, help_string + special_str)
 
 
