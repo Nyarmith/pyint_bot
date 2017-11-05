@@ -9,6 +9,6 @@ WORKDIR /opt/pyint_bot/
 
 RUN pip install telepot && pip install pexpect
 
-ADD pint_bot_docker.py .
+ADD pyint_bot_docker.py .
 
-CMD python3 pint_bot_docker.py
+CMD python3 pyint_bot_docker.py

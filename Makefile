@@ -1,4 +1,4 @@
-.PHONY: default build run shell remove inspect status stop
+.PHONY: default build run shell remove inspect status stop rm
 
 include makefile.config
 
@@ -29,3 +29,6 @@ status:
 
 stop:
 	docker stop $(ARGS) $(name)
+
+rm:
+	docker rm -f $(ARGS) $(name)
