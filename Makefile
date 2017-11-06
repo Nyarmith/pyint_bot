@@ -28,4 +28,4 @@ stop:
 	docker stop $(ARGS) $(name)
 
 rm:
-	docker rm -f $(ARGS) $(name)
+	docker rm -f --volumes=true $(ARGS) $(name)
