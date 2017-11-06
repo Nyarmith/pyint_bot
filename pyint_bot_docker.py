@@ -9,6 +9,15 @@ import re
 session = pexpect.spawn('python3')
 session.expect('>>>')
 
+#almost the same as pexpect.spawn.writelines(), but with output
+def writelines(cmds):
+    global session
+    rstring=''
+    for line in cmds:
+        session.sendline()
+        rstring += session.before
+    return rstring
+
 def handle(msg):
     global session
     chat_id = msg['chat']['id']
@@ -18,11 +27,12 @@ def handle(msg):
 
     if command[:4] == '/run':
         cmd = command[command.find(' ')+1:]
-        cmd = re.sub(r'#n','\n',cmd)
-        session.sendline(cmd)
+        #cmd = re.sub(r'#n','\n',cmd)
+        cmd = re.sub(r'#t','    ',cmd)
+        result = writelines(cmd.split('#n'))
         session.expect(r'>>>|\.\.\.', timeout=15)
-        print(session.before)
-        bot.sendMessage(chat_id, session.before)
+        print(result)
+        bot.sendMessage(chat_id, result)
 
     elif command[:6] == '/reset':
         session.kill(0)
