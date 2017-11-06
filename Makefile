@@ -18,9 +18,6 @@ run:
 shell:
 	docker exec --interactive=true --tty=true $(name) /bin/bash $(ARGS)
 
-remove:
-	docker rm --volumes=true $(ARGS) $(name)
-
 inspect:
 	docker inspect $(ARGS) $(name)
 
