@@ -117,6 +117,7 @@ def handle(msg):
             snippets[chat_id].append([cmd, fromusr])
 
         save()
+        bot.sendMessage(chat_id, 'snippet saved')
 
     elif command[:5] == '/list':
         #list saved snippets, 10 at a time
