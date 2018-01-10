@@ -101,7 +101,7 @@ def handle(msg):
         m = listedlast + 10
         rsp=''
         #formatting may cause issues, look at https://stackoverflow.com/questions/21864192/most-elegant-way-to-format-multi-line-strings-in-python if necessary
-        for listedlast <  m and listedlast < len(snippets[chat_id]):
+        while listedlast <  m and listedlast < len(snippets[chat_id]):
             rsp += '\n#{}\n <pre>\n{}\n</pre>\n' \
                    ' \--submitted by <a href=\"tg://usr?id={}\">user_name_maybe?</a>\n' \
                    .format(listedlast, snippets[chat][listedlast][0], snippet[chat][listedlast][1])
@@ -120,7 +120,7 @@ def handle(msg):
         n = command.split()
         try:
             num=int(n)
-            if (len(snippets[chat_id]) >= num || num < 0):
+            if len(snippets[chat_id]) >= num or num < 0:
                 bot.sendMessage(chat_id, 'error, {} out of range'.format(n))
             else:
                 del snippets[chat_id][num]

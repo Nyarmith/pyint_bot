@@ -10,6 +10,7 @@ build:
 run:
 	docker run \
 	--name=$(name) \
+        -v $(volume):/opt/pyint_bot/chats \
 	$(runargs) \
 	$(img-name):$(tag) \
 	$(ARGS)
