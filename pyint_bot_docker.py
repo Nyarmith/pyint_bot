@@ -186,6 +186,8 @@ def handle(msg):
         rsp = dumpq(outq)
         if rsp != '':
             bot.sendMessage(chat_id, rsp)
+        else:
+            bot.sendMessage(chat_id, 'KeyboardInterrupt')
 
     elif command[:5] == '/help':
         help_string =''
