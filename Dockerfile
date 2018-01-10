@@ -7,7 +7,7 @@ VOLUME /opt/pyint_bot/chats
 
 WORKDIR /opt/pyint_bot/
 
-RUN pip install telepot && pip install pexpect && pip install yaml
+RUN pip install telepot && pip install pexpect && pip install pyyaml
 
 ADD pyint_bot_docker.py .
 
