@@ -93,7 +93,7 @@ def handle(msg):
         proc.stdin.write(cmd.encode())
         proc.stdin.flush()
 
-        time.sleep(.25)
+        time.sleep(.70)
 
         rsp = dumpq(outq)
         if (rsp != ''):
@@ -114,6 +114,7 @@ def handle(msg):
             cmd = command[command.find(' ')+1:]
             cmd = re.sub(r'#t','    ',cmd)
             cmd = (cmd.split('#n'))
+            cmd = '\n'.join(cmd) + '\n'
             snippets[chat_id].append([cmd, fromusr])
 
         save()
@@ -183,7 +184,7 @@ def handle(msg):
 
     elif command[:6] == '/ctrlc':
         proc.send_signal(signal.SIGINT)
-        time.sleep(.25)
+        time.sleep(.60)
         rsp = dumpq(outq)
         if rsp != '':
             bot.sendMessage(chat_id, rsp)
