@@ -18,3 +18,4 @@ TODO:
 * No logging occurs on exceptions in docker. Make docker log those maybe by changing a run setting.
 * Add per-chat streams. Could be done with per-chat subprocess.
     * eventual goal, is to send new chat message on every new prompt (empty >>>)
+* Make quoting a /run command work with /save
