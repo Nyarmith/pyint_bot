@@ -1,12 +1,16 @@
 #!/usr/bin/python3
 import telepot
+import telepot.text as telefmt
 import queue
 import yaml
 import os
 import subprocess
 import threading
+import time
 import sys
 import re
+import pdb
+import signal
 
 
 
@@ -19,14 +23,15 @@ lastusr=''
 listedlast = 0
 
 #stdout and stderr queues
-outq=queue.Queue()
-errq=queue.Queue()
+outq = queue.Queue()
 
-snippets={} #format { chat_id_1:[ [snippet, user_id], [], [] ... ], chat_id_2:[ ... ] }
 if os.path.isfile(savefile):
+    global snippets
     f = open(savefile)
     snippets=yaml.load(f.read())
     f.close()
+else:
+    snippets={} #format { chat_id_1:[ [snippet, user_id], [], [] ... ], chat_id_2:[ ... ] }
 
 def save():
     f = open(savefile,'w')
@@ -34,13 +39,15 @@ def save():
     f.close()
 
 #threaded output readers
-def stdout_reader(proc):
-    for line in iter(proc.stdout.stderr,b''):
-        outq.put(line.decode('utf-8'))
+def stdout_reader(proc, q):
+    for line in iter(proc.stdout.readline,b''):
+        q.put(line.decode('utf-8'))
 
-def stderr_reader(proc):
+def stderr_reader(proc, q):
     for line in iter(proc.stderr.readline,b''):
-        errq.put(line.decode('utf-8'))
+        l = line.decode('utf-8')
+        l=re.sub(r'>>> |\.\.\. ','',l)
+        q.put(l)
 
 def dumpq(Q):
     ret=''
@@ -53,33 +60,48 @@ proc = subprocess.Popen(['python3','-i'],
         stdin=subprocess.PIPE,
         stderr=subprocess.PIPE)
 
-out_t = threading.Thread(target=stdout_reader,args=(proc))
-err_t = threading.Thread(target=stdout_reader,args=(proc))
+#args seem necessary to bind outside vars to a thread(i.e. no globals)
+out_t = threading.Thread(target=stdout_reader,args=(proc,outq))
+err_t = threading.Thread(target=stderr_reader,args=(proc,outq))
+#these aren't running concurrently due to the GIL goddamnit
+out_t.start()
+err_t.start()
+
 
 #main handle loop
 def handle(msg):
-    global session
+    global listedlast
+    global lastcmd
+    global lastusr
+    global proc
+    global out_t
+    global err_t
     chat_id = msg['chat']['id']
     command = msg['text']
-    fromusr = msg['from'] #{'first name':<users first name>, 'id': <users id>}
+    fromusr = msg['from'] #{'first_name':<users first name>, 'id': <users id>}
 
     print('got command: {}'.format(command))
 
     if command[:4] == '/run':
         cmd = command[command.find(' ')+1:]
         cmd = re.sub(r'#t','    ',cmd)
-        res = (cmd.split('#n'))
-        print(res)
+        cmd = (cmd.split('#n'))
+        cmd = '\n'.join(cmd) + '\n'
+        print('formatted cmd:{}'.format(cmd))
 
-        proc.stdin.write(res.encode())
+        #pdb.set_trace()
+        proc.stdin.write(cmd.encode())
         proc.stdin.flush()
 
-        time.usleep(.25)
+        time.sleep(.25)
 
-        rsp = dumpq(errq) + dumpq(outq)
-        bot.sendMessage(chat_id, rsp)
+        rsp = dumpq(outq)
+        if (rsp != ''):
+            #rsp = '```python\n'+cmd + '--------\n' + rsp + '\n```'
+            rsp = cmd + '--------\n' + rsp 
+            bot.sendMessage(chat_id, rsp)
 
-        lastcmd=res
+        lastcmd=cmd
         lastusr=fromusr
  
     elif command[:5] == '/save':
@@ -100,33 +122,39 @@ def handle(msg):
         #list saved snippets, 10 at a time
         m = listedlast + 10
         rsp=''
+        start=listedlast+1
         #formatting may cause issues, look at https://stackoverflow.com/questions/21864192/most-elegant-way-to-format-multi-line-strings-in-python if necessary
         while listedlast <  m and listedlast < len(snippets[chat_id]):
-            rsp += '\n#{}\n <pre>\n{}\n</pre>\n' \
-                   ' \--submitted by <a href=\"tg://usr?id={}\">user_name_maybe?</a>\n' \
-                   .format(listedlast, snippets[chat][listedlast][0], snippet[chat][listedlast][1])
+            rsp += '\n#{} <pre>\n{}\n</pre>' \
+                   ' \--submitted by <a href=\"tg://usr?id={})\">@{}</a>\n' \
+                   .format(listedlast+1,
+                           snippets[chat_id][listedlast][0],
+                           snippets[chat_id][listedlast][1]['id'],
+                           snippets[chat_id][listedlast][1]['first_name'])
             listedlast += 1
 
-        rsp += '\n out of {}'.format(len(snippets[chat_id]))
+        rsp += '\n [{},{}] of {}'.format(start,listedlast,len(snippets[chat_id]))
 
         if listedlast == len(snippets[chat_id]):
             listedlast = 0
 
-        bot.sendMessage(chat_id, rsp)
+        #rsp = telefmt.apply_entities_as_html(rsp,[])
+        bot.sendMessage(chat_id, rsp,parse_mode='html')
 
     elif command[:7] == '/remove':
         #accept id(i.e. number of input in its order)
         #and remove that from the list
         n = command.split()
         try:
-            num=int(n)
+            num=int(n[1])-1
             if len(snippets[chat_id]) >= num or num < 0:
-                bot.sendMessage(chat_id, 'error, {} out of range'.format(n))
+                bot.sendMessage(chat_id,
+                    'error, {} out of range: [1,{}]'.format(n,len(snippets[chat_id])))
             else:
                 del snippets[chat_id][num]
 
         except:
-            bot.sendMessage(chat_id, 'error, {} not a number'.format(n))
+            bot.sendMessage(chat_id, 'error, {} not a number'.format(n[1]))
 
     elif command[:6] == '/reset':
         proc.terminate()
@@ -137,23 +165,36 @@ def handle(msg):
                 stdin=subprocess.PIPE,
                 stderr=subprocess.PIPE)
 
-        out_t = threading.Thread(target=stdout_reader,args=(proc))
-        err_t = threading.Thread(target=stdout_reader,args=(proc))
+        out_t = threading.Thread(target=stdout_reader,args=(proc,outq))
+        err_t = threading.Thread(target=stderr_reader,args=(proc,outq))
+        out_t.start()
+        err_t.start()
 
     elif command[:8] == '/restart': #restart docker container
         sys.exit(0)		    #assumes setting 'restart: always'
 
     elif command[:6] == '/start':
-        snippets[chat_id] = []
+        try:
+            snippets[chat_id]
+        except:
+            snippets[chat_id] = []
         save()
+
+    elif command[:6] == '/ctrlc':
+        proc.send_signal(signal.SIGINT)
+        time.sleep(.25)
+        rsp = dumpq(outq)
+        if rsp != '':
+            bot.sendMessage(chat_id, rsp)
 
     elif command[:5] == '/help':
         help_string =''
         special_str='lol'
         bot.sendMessage(chat_id, help_string + special_str)
 
-    if listedlast and command[:5] != '/list':
+    if listedlast != 0 and command[:5] != '/list':
         listedlast = 0
+
 
 
 mykey = os.environ['TELEKEY'] #yaml.load(cfgstr)['key']
